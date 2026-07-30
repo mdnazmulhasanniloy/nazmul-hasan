@@ -1,0 +1,16 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { getPortfolioContent } from "@/lib/content";
+import type { Metadata } from "next";
+import { Reveal } from "@/components/motion";
+
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const {posts}=await getPortfolioContent();const post=posts.find(p=>p.slug===slug);if(!post)return{title:"Article"};return{title:post.title,description:post.excerpt,alternates:{canonical:`/blog/${post.slug}`},openGraph:{title:post.title,description:post.excerpt,type:"article",url:`/blog/${post.slug}`},twitter:{card:"summary_large_image",title:post.title,description:post.excerpt}};}
+export default async function Article({params}:{params:Promise<{slug:string}>}){
+  const {slug}=await params; const {posts}=await getPortfolioContent(); const post=posts.find(p=>p.slug===slug); if(!post)notFound();
+  return <main id="main" className="pt-28"><article className="shell py-14 sm:py-20"><Link href="/blog" className="focus-ring inline-flex min-h-11 items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted hover:text-white"><ArrowLeft size={15}/> All field notes</Link>
+    <Reveal className="mx-auto mt-10 max-w-4xl"><div className="mb-6 flex gap-4 font-mono text-[10px] uppercase tracking-wider"><span className="text-acid">{post.category}</span><span className="text-muted">{post.date} · {post.read} read</span></div><h1 className="text-balance text-5xl font-semibold leading-[1] tracking-[-.05em] sm:text-7xl">{post.title}</h1><p className="mt-8 text-xl leading-relaxed text-muted">{post.excerpt}</p>
+      <div className="my-12 h-px bg-line"/>
+      <div className="space-y-7 text-lg leading-[1.85] text-[#c7cec9]"><p>Distributed systems are rarely undone by the concept in the architecture diagram. They fail in the distance between the diagram and production: retries arrive late, clocks disagree, clients disappear, and a “temporary” workaround becomes a permanent contract.</p><h2 className="pt-5 text-3xl font-semibold tracking-tight text-white">Start with the failure, not the feature</h2><p>A reliable design makes uncertainty explicit. Before choosing infrastructure, define what a repeated request means, how long its identity matters, and who owns the final state when two services disagree. These decisions are domain decisions wearing technical clothes.</p><blockquote className="border-l-2 border-acid py-2 pl-7 text-2xl font-medium leading-relaxed text-white">The most useful architecture is the one an on-call engineer can reason about at 3 a.m.</blockquote><p>Strong systems reduce the number of things that must be true simultaneously. They keep boundaries clear, record intent durably, expose meaningful signals, and recover without requiring heroics.</p><h2 className="pt-5 text-3xl font-semibold tracking-tight text-white">Boring is an operational advantage</h2><p>Novelty has a cost curve. Use it where the problem demands it, not where the résumé rewards it. A smaller set of well-understood tools creates shared intuition—and shared intuition is what makes a team fast when conditions are least forgiving.</p></div>
+    </Reveal></article></main>;
+}

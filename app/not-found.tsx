@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound(){return <main id="main" className="shell grid min-h-dvh place-items-center pt-20 text-center"><div><p className="font-mono text-8xl font-bold text-acid">404</p><h1 className="mt-4 text-3xl font-semibold">This route returned nothing.</h1><p className="mt-3 text-muted">The resource may have moved or never existed.</p><Link href="/" className="focus-ring mt-8 inline-flex min-h-12 items-center bg-acid px-6 font-mono text-xs font-bold uppercase tracking-wider text-ink">Return home</Link></div></main>}
