@@ -1,7 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-
-Host: https://nazmulhasan.dev
-Sitemap: https://nazmulhasan.dev/sitemap.xml

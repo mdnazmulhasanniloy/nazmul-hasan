@@ -61,6 +61,10 @@ export async function getPortfolioContent(): Promise<PortfolioContent> {
   const collection = db.collection<PortfolioContent & { _id: string }>("content");
   const existing = await collection.findOne({ _id: "portfolio" });
   if (existing) {
+    const savedSettings = (existing.settings ?? {}) as Record<string, unknown>;
+    const settings = Object.fromEntries(
+      Object.keys(defaultContent.settings).map(key => [key, savedSettings[key] ?? defaultContent.settings[key as keyof typeof defaultContent.settings]]),
+    ) as PortfolioContent["settings"];
     return {
       projects: existing.projects ?? defaultContent.projects,
       experience: existing.experience ?? defaultContent.experience,
@@ -69,7 +73,7 @@ export async function getPortfolioContent(): Promise<PortfolioContent> {
       skills: existing.skills ?? defaultContent.skills,
       testimonials: existing.testimonials ?? defaultContent.testimonials,
       posts: existing.posts ?? defaultContent.posts,
-      settings: { ...defaultContent.settings, ...(existing.settings ?? {}) },
+      settings,
     };
   }
   await collection.insertOne({ _id: "portfolio", ...defaultContent });

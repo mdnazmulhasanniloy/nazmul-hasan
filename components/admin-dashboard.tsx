@@ -2,8 +2,9 @@
 
 import { ChangeEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, Check, Database, ImagePlus, LogOut, Plus, Save, Trash2, UploadCloud } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Database, ImagePlus, Inbox, LogOut, Mail, Plus, Save, Trash2, UploadCloud } from "lucide-react";
 import type { EditableSection, PortfolioContent } from "@/lib/content";
+import type { ContactInquiry } from "@/lib/inquiries";
 
 type FormObject = Record<string, unknown>;
 const sections: { key: EditableSection; label: string }[] = [
@@ -21,7 +22,7 @@ function emptyFrom(value: unknown): unknown {
   return "";
 }
 
-export function AdminDashboard({ initialContent }: { initialContent: PortfolioContent }) {
+export function AdminDashboard({ initialContent, initialInquiries }: { initialContent: PortfolioContent; initialInquiries: ContactInquiry[] }) {
   const router = useRouter();
   const [content, setContent] = useState<PortfolioContent>(() => ({
     ...initialContent,
@@ -74,7 +75,7 @@ export function AdminDashboard({ initialContent }: { initialContent: PortfolioCo
   }
   async function logout() { await fetch("/api/admin/logout", { method: "POST" }); router.push("/admin/login"); router.refresh(); }
 
-  return <div className="grid min-w-0 gap-4 xl:grid-cols-[220px_270px_minmax(0,1fr)] xl:gap-5">
+  return <><InquiryInbox inquiries={initialInquiries}/><div className="grid min-w-0 gap-4 xl:grid-cols-[220px_270px_minmax(0,1fr)] xl:gap-5">
     <aside className="card min-w-0 p-3 xl:sticky xl:top-24 xl:h-fit">
       <div className="flex items-center justify-between gap-3 border-b border-line px-2 pb-3 xl:mb-3 xl:block xl:border-b-0 xl:px-0 xl:pb-0">
         <div className="flex items-center gap-3 xl:border-b xl:border-line xl:p-3 xl:pb-5"><span className="grid size-10 shrink-0 place-items-center bg-acid text-ink"><Database size={18}/></span><div><strong className="block text-sm">Content CMS</strong><span className="font-mono text-[9px] uppercase tracking-wider text-muted">MongoDB + R2</span></div></div>
@@ -94,7 +95,26 @@ export function AdminDashboard({ initialContent }: { initialContent: PortfolioCo
       {current ? <ObjectFields value={current} onChange={setCurrent} path={active}/> : <div className="grid min-h-80 place-items-center text-center text-muted"><div><p>No items in this section.</p><button onClick={addItem} className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 bg-acid px-5 text-sm font-semibold text-ink"><Plus size={16}/>Add first item</button></div></div>}
       {error && <p role="alert" className="mt-5 border border-red-400/40 bg-red-400/10 p-3 text-sm text-red-200">{error}</p>}
     </section>
-  </div>;
+  </div></>;
+}
+
+function InquiryInbox({ inquiries }: { inquiries: ContactInquiry[] }) {
+  return <section className="card mb-5 overflow-hidden">
+    <header className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="flex items-center gap-3"><span className="grid size-11 place-items-center bg-acid text-ink"><Inbox size={18}/></span><div><h2 className="text-xl font-semibold">Contact inbox</h2><p className="mt-1 text-xs text-muted">Messages submitted from your portfolio contact form</p></div></div>
+      <span className="w-fit border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted">{inquiries.length} message{inquiries.length === 1 ? "" : "s"}</span>
+    </header>
+    {inquiries.length ? <div className="grid max-h-[520px] gap-px overflow-y-auto bg-line">
+      {inquiries.map(inquiry => <article key={inquiry.id} className="bg-ink p-5 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div><h3 className="font-semibold text-white">{inquiry.name}</h3><p className="mt-1 text-xs text-muted">{inquiry.company || "No company provided"}</p></div>
+          <time className="font-mono text-[9px] uppercase tracking-wider text-muted" dateTime={inquiry.createdAt}>{inquiry.createdAt.slice(0, 16).replace("T", " · ")} UTC</time>
+        </div>
+        <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted">{inquiry.message}</p>
+        <a href={`mailto:${inquiry.email}`} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 border border-line px-4 font-mono text-[10px] uppercase tracking-wider text-white transition-colors hover:border-acid hover:text-acid"><Mail size={14}/>Reply to {inquiry.email}</a>
+      </article>)}
+    </div> : <div className="grid min-h-40 place-items-center p-6 text-center text-muted"><div><Inbox className="mx-auto mb-3 opacity-50" size={28}/><p>No contact messages yet.</p></div></div>}
+  </section>;
 }
 
 function ObjectFields({ value, onChange, path }: { value: FormObject; onChange: (value: FormObject) => void; path: string }) {
@@ -106,10 +126,11 @@ function Field({ label, value, onChange, path }: { label: string; value: unknown
   const pretty = label.replace(/([A-Z])/g, " $1").replace(/^./, letter => letter.toUpperCase());
   const longText = /description|text|introduction|quote|excerpt|long/i.test(label);
   const imageField = /image|cover|thumbnail/i.test(label);
+  const endpointField = label === "contactFormEndpoint";
   if (imageField && typeof value === "string") return <ImageUpload label={pretty} value={value} onChange={onChange}/>;
   if (typeof value === "boolean") return <label className="flex min-h-12 items-center gap-3 border border-line p-3 text-sm"><input type="checkbox" checked={value} onChange={event => onChange(event.target.checked)} className="size-4 accent-[#c7ff4a]"/>{pretty}</label>;
   if (typeof value === "number") return <label className="block"><span className="mb-2.5 block font-mono text-[10px] uppercase tracking-[.12em] text-muted">{pretty}</span><input type="number" value={value} onChange={event => onChange(Number(event.target.value))} className="focus-ring min-h-14 w-full border border-line bg-ink px-4 text-base text-white"/></label>;
-  if (typeof value === "string") return <label className={longText ? "block sm:col-span-2" : "block"}><span className="mb-2.5 block font-mono text-[10px] uppercase tracking-[.12em] text-muted">{pretty}</span>{longText ? <textarea value={value} onChange={event => onChange(event.target.value)} rows={path.startsWith("settings.") ? 5 : 4} className="focus-ring w-full resize-y border border-line bg-ink p-4 text-base leading-relaxed text-white placeholder:text-muted/50"/> : <input value={value} onChange={event => onChange(event.target.value)} className="focus-ring min-h-14 w-full border border-line bg-ink px-4 text-base text-white placeholder:text-muted/50"/>}</label>;
+  if (typeof value === "string") return <label className={longText || endpointField ? "block sm:col-span-2" : "block"}><span className="mb-2.5 block font-mono text-[10px] uppercase tracking-[.12em] text-muted">{pretty}</span>{longText ? <textarea value={value} onChange={event => onChange(event.target.value)} rows={path.startsWith("settings.") ? 5 : 4} className="focus-ring w-full resize-y border border-line bg-ink p-4 text-base leading-relaxed text-white placeholder:text-muted/50"/> : <><input type={endpointField ? "url" : "text"} value={value} onChange={event => onChange(event.target.value)} placeholder={endpointField ? "https://api.yourdomain.com/api/contact" : undefined} className="focus-ring min-h-14 w-full border border-line bg-ink px-4 text-base text-white placeholder:text-muted/50"/>{endpointField && <span className="mt-2 block text-xs leading-relaxed text-muted">The contact form will POST submissions to this HTTPS endpoint. Leave blank to open the visitor’s email app instead.</span>}</>}</label>;
   if (Array.isArray(value)) {
     if (!value.length || value.every(item => typeof item === "string")) return <label className="block sm:col-span-2"><span className="mb-2.5 block font-mono text-[10px] uppercase tracking-[.12em] text-muted">{pretty}</span><input value={(value as string[]).join(", ")} onChange={event => onChange(event.target.value.split(",").map(item => item.trim()).filter(Boolean))} placeholder="Separate items with commas" className="focus-ring min-h-14 w-full border border-line bg-ink px-4 text-base text-white"/></label>;
     return <NestedList label={pretty} value={value as FormObject[]} onChange={onChange} path={path}/>;

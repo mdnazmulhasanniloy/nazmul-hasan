@@ -16,6 +16,6 @@ export default async function ContactPage(){const {settings}=await getPortfolioC
       <SocialLink href={settings.linkedin} label="LinkedIn"><Linkedin size={15}/></SocialLink>
       <SocialLink href={settings.instagram} label="Instagram"><Instagram size={15}/></SocialLink>
     </div>
-  </Reveal><Reveal delay={.1}><ContactForm email={settings.email}/></Reveal></div></section></main>}
+  </Reveal><Reveal delay={.1}><ContactForm/></Reveal></div></section></main>}
 
 function SocialLink({href,label,children}:{href:string;label:string;children:React.ReactNode}){return <a href={href} target="_blank" rel="noreferrer" className="focus-ring inline-flex min-h-11 items-center gap-2 border border-line px-4 font-mono text-[10px] uppercase tracking-wider text-muted transition-colors hover:border-acid hover:text-white">{children}{label}<ArrowUpRight size={12}/></a>}

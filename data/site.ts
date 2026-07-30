@@ -7,5 +7,4 @@ export const siteConfig = {
   github: process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/mdnazmulhasanniloy",
   linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "https://www.linkedin.com/in/mdnazmulhasan323/",
   instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://www.instagram.com/dev.nazmulhasan",
-  formEndpoint: process.env.NEXT_PUBLIC_CONTACT_FORM_ENDPOINT ?? "",
 } as const;
