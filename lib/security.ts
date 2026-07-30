@@ -35,6 +35,10 @@ function assertSafeUrl(value: string) {
   if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error("Only HTTP(S) URLs are allowed.");
 }
 
+function assertEmail(value: string) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) throw new Error("Enter a valid email address.");
+}
+
 export function validateContentValue(value: unknown, depth = 0): void {
   if (depth > MAX_DEPTH) throw new Error("Content is nested too deeply.");
   if (typeof value === "string") {
@@ -56,6 +60,7 @@ export function validateContentValue(value: unknown, depth = 0): void {
   if (entries.length > MAX_ITEMS) throw new Error("Too many content fields.");
   for (const [key, item] of entries) {
     if (key.startsWith("$") || key.includes(".")) throw new Error("Invalid content field name.");
+    if (typeof item === "string" && key === "email") assertEmail(item);
     if (typeof item === "string" && /^(href|image|certificate|github|linkedin|instagram)$/i.test(key)) assertSafeUrl(item);
     validateContentValue(item, depth + 1);
   }

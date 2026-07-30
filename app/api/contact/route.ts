@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createInquiry } from "@/lib/inquiries";
 import { isSameOrigin, readJson } from "@/lib/security";
+import { sendInquiryNotification } from "@/lib/mailer";
+import { getPortfolioContent } from "@/lib/content";
 
 const attempts = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 60 * 60 * 1000;
@@ -37,9 +39,16 @@ export async function POST(request: Request) {
       message,
       ipHash: createHash("sha256").update(`${process.env.AUTH_SECRET}:${ip}`).digest("hex"),
     });
+    const { settings } = await getPortfolioContent();
+    let emailSent = false;
+    try {
+      emailSent = await sendInquiryNotification({ name, email, company, message, recipient: settings.email });
+    } catch (error) {
+      console.error("Contact notification email failed:", error instanceof Error ? error.message : "Unknown mail error");
+    }
     entry.count += 1;
     attempts.set(ip, entry);
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json({ ok: true, emailSent }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "The message could not be saved." }, { status: 400 });
   }

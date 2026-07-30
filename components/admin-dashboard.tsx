@@ -4,7 +4,7 @@ import { ChangeEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Check, Database, ImagePlus, Inbox, LogOut, Mail, Plus, Save, Trash2, UploadCloud } from "lucide-react";
 import type { EditableSection, PortfolioContent } from "@/lib/content";
-import type { ContactInquiry } from "@/lib/inquiries";
+import type { InquiryPage } from "@/lib/inquiries";
 
 type FormObject = Record<string, unknown>;
 const sections: { key: EditableSection; label: string }[] = [
@@ -22,7 +22,7 @@ function emptyFrom(value: unknown): unknown {
   return "";
 }
 
-export function AdminDashboard({ initialContent, initialInquiries }: { initialContent: PortfolioContent; initialInquiries: ContactInquiry[] }) {
+export function AdminDashboard({ initialContent, initialInquiries }: { initialContent: PortfolioContent; initialInquiries: InquiryPage }) {
   const router = useRouter();
   const [content, setContent] = useState<PortfolioContent>(() => ({
     ...initialContent,
@@ -98,21 +98,55 @@ export function AdminDashboard({ initialContent, initialInquiries }: { initialCo
   </div></>;
 }
 
-function InquiryInbox({ inquiries }: { inquiries: ContactInquiry[] }) {
+function InquiryInbox({ inquiries: initialInquiries }: { inquiries: InquiryPage }) {
+  const [inquiries, setInquiries] = useState(initialInquiries);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadPage(page: number) {
+    setLoading(true); setError("");
+    try {
+      const response = await fetch(`/api/admin/inquiries?page=${page}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("Could not load messages.");
+      setInquiries(await response.json());
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Could not load messages.");
+    } finally { setLoading(false); }
+  }
+
+  async function remove(id: string, name: string) {
+    if (!confirm(`Delete the message from “${name}”? This cannot be undone.`)) return;
+    setLoading(true); setError("");
+    try {
+      const response = await fetch(`/api/admin/inquiries/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Could not delete the message.");
+      const nextPage = inquiries.items.length === 1 && inquiries.page > 1 ? inquiries.page - 1 : inquiries.page;
+      await loadPage(nextPage);
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Could not delete the message.");
+      setLoading(false);
+    }
+  }
+
   return <section className="card mb-5 overflow-hidden">
     <header className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div className="flex items-center gap-3"><span className="grid size-11 place-items-center bg-acid text-ink"><Inbox size={18}/></span><div><h2 className="text-xl font-semibold">Contact inbox</h2><p className="mt-1 text-xs text-muted">Messages submitted from your portfolio contact form</p></div></div>
-      <span className="w-fit border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted">{inquiries.length} message{inquiries.length === 1 ? "" : "s"}</span>
+      <span className="w-fit border border-line px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted">{inquiries.total} message{inquiries.total === 1 ? "" : "s"}</span>
     </header>
-    {inquiries.length ? <div className="grid max-h-[520px] gap-px overflow-y-auto bg-line">
-      {inquiries.map(inquiry => <article key={inquiry.id} className="bg-ink p-5 sm:p-6">
+    {error && <p role="alert" className="border-b border-red-400/30 bg-red-400/10 p-4 text-sm text-red-200">{error}</p>}
+    {inquiries.items.length ? <div className={`grid gap-px bg-line transition-opacity ${loading ? "pointer-events-none opacity-50" : ""}`}>
+      {inquiries.items.map(inquiry => <article key={inquiry.id} className="bg-ink p-5 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div><h3 className="font-semibold text-white">{inquiry.name}</h3><p className="mt-1 text-xs text-muted">{inquiry.company || "No company provided"}</p></div>
           <time className="font-mono text-[9px] uppercase tracking-wider text-muted" dateTime={inquiry.createdAt}>{inquiry.createdAt.slice(0, 16).replace("T", " · ")} UTC</time>
         </div>
         <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted">{inquiry.message}</p>
-        <a href={`mailto:${inquiry.email}`} className="focus-ring mt-5 inline-flex min-h-11 items-center gap-2 border border-line px-4 font-mono text-[10px] uppercase tracking-wider text-white transition-colors hover:border-acid hover:text-acid"><Mail size={14}/>Reply to {inquiry.email}</a>
+        <div className="mt-5 flex flex-wrap gap-2"><a href={`mailto:${inquiry.email}`} className="focus-ring inline-flex min-h-11 items-center gap-2 border border-line px-4 font-mono text-[10px] uppercase tracking-wider text-white transition-colors hover:border-acid hover:text-acid"><Mail size={14}/>Reply to {inquiry.email}</a><button type="button" onClick={() => remove(inquiry.id, inquiry.name)} disabled={loading} className="focus-ring inline-flex min-h-11 items-center gap-2 border border-red-400/30 px-4 font-mono text-[10px] uppercase tracking-wider text-red-300 transition-colors hover:bg-red-400/10 disabled:opacity-50"><Trash2 size={14}/>Delete</button></div>
       </article>)}
+      <footer className="flex flex-col gap-3 bg-ink p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <p className="font-mono text-[9px] uppercase tracking-wider text-muted">Page {inquiries.page} of {inquiries.totalPages} · 5 per page</p>
+        <div className="flex gap-2"><button type="button" disabled={loading || inquiries.page <= 1} onClick={() => loadPage(inquiries.page - 1)} className="focus-ring min-h-10 border border-line px-4 font-mono text-[9px] uppercase tracking-wider disabled:opacity-30">Previous</button><button type="button" disabled={loading || inquiries.page >= inquiries.totalPages} onClick={() => loadPage(inquiries.page + 1)} className="focus-ring min-h-10 border border-line px-4 font-mono text-[9px] uppercase tracking-wider disabled:opacity-30">Next</button></div>
+      </footer>
     </div> : <div className="grid min-h-40 place-items-center p-6 text-center text-muted"><div><Inbox className="mx-auto mb-3 opacity-50" size={28}/><p>No contact messages yet.</p></div></div>}
   </section>;
 }
