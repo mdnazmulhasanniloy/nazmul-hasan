@@ -55,6 +55,10 @@ export const defaultContent: PortfolioContent = {
 export const editableSections = ["projects", "experience", "education", "courses", "skills", "testimonials", "posts", "settings"] as const;
 export type EditableSection = (typeof editableSections)[number];
 
+function normalizeSkills(skills: PortfolioContent["skills"]) {
+  return skills.map((skill, index) => ({ ...skill, index: skill.index || String(index + 1).padStart(2, "0") }));
+}
+
 export async function getPortfolioContent(): Promise<PortfolioContent> {
   noStore();
   const db = await getDatabase();
@@ -70,7 +74,7 @@ export async function getPortfolioContent(): Promise<PortfolioContent> {
       experience: existing.experience ?? defaultContent.experience,
       education: existing.education ?? defaultContent.education,
       courses: existing.courses ?? defaultContent.courses,
-      skills: existing.skills ?? defaultContent.skills,
+      skills: normalizeSkills(existing.skills ?? defaultContent.skills),
       testimonials: existing.testimonials ?? defaultContent.testimonials,
       posts: existing.posts ?? defaultContent.posts,
       settings,

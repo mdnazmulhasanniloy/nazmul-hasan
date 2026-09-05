@@ -161,6 +161,7 @@ export const experience = [
 export type SkillCategory = "Front-End" | "Back-End" | "Database" | "DevOps";
 
 export type TechnicalSkill = {
+  index: string;
   name: string;
   level: "Expert" | "Advanced" | "Proficient" | "Intermediate" | "Beginner";
   description: string;
@@ -169,28 +170,28 @@ export type TechnicalSkill = {
 };
 
 export const technicalSkills: TechnicalSkill[] = [
-  { name: "React.js", level: "Expert", description: "Component-driven UIs", percentage: 90, category: "Front-End" },
-  { name: "TypeScript", level: "Advanced", description: "Type-safe JavaScript", percentage: 82, category: "Front-End" },
-  { name: "Tailwind CSS", level: "Expert", description: "Utility-first CSS", percentage: 90, category: "Front-End" },
-  { name: "Redux", level: "Proficient", description: "State management", percentage: 78, category: "Front-End" },
-  { name: "Shadcn/UI", level: "Advanced", description: "Component library", percentage: 80, category: "Front-End" },
-  { name: "HTML5", level: "Expert", description: "Semantic markup", percentage: 96, category: "Front-End" },
-  { name: "CSS3", level: "Expert", description: "Styling and animations", percentage: 92, category: "Front-End" },
-  { name: "Next.js", level: "Proficient", description: "Full-stack React", percentage: 72, category: "Front-End" },
-  { name: "Node.js", level: "Advanced", description: "Server-side JavaScript", percentage: 85, category: "Back-End" },
-  { name: "Express.js", level: "Advanced", description: "Web framework", percentage: 86, category: "Back-End" },
-  { name: "REST API", level: "Advanced", description: "API design", percentage: 88, category: "Back-End" },
-  { name: "GraphQL", level: "Intermediate", description: "Query language", percentage: 60, category: "Back-End" },
-  { name: "Prisma", level: "Proficient", description: "Type-safe ORM", percentage: 75, category: "Back-End" },
-  { name: "MongoDB", level: "Advanced", description: "NoSQL database", percentage: 80, category: "Database" },
-  { name: "PostgreSQL", level: "Proficient", description: "Relational database", percentage: 70, category: "Database" },
-  { name: "MySQL", level: "Beginner", description: "SQL database", percentage: 55, category: "Database" },
-  { name: "Redis", level: "Beginner", description: "In-memory caching", percentage: 58, category: "Database" },
-  { name: "Docker", level: "Proficient", description: "Containerization", percentage: 72, category: "DevOps" },
-  { name: "Nginx", level: "Proficient", description: "Web server and proxy", percentage: 74, category: "DevOps" },
-  { name: "Git", level: "Advanced", description: "Version control", percentage: 88, category: "DevOps" },
-  { name: "Linux", level: "Proficient", description: "Server management", percentage: 70, category: "DevOps" },
-  { name: "AWS", level: "Beginner", description: "Cloud services", percentage: 50, category: "DevOps" },
+  { index: "01", name: "React.js", level: "Expert", description: "Component-driven UIs", percentage: 90, category: "Front-End" },
+  { index: "02", name: "TypeScript", level: "Advanced", description: "Type-safe JavaScript", percentage: 82, category: "Front-End" },
+  { index: "03", name: "Tailwind CSS", level: "Expert", description: "Utility-first CSS", percentage: 90, category: "Front-End" },
+  { index: "04", name: "Redux", level: "Proficient", description: "State management", percentage: 78, category: "Front-End" },
+  { index: "05", name: "Shadcn/UI", level: "Advanced", description: "Component library", percentage: 80, category: "Front-End" },
+  { index: "06", name: "HTML5", level: "Expert", description: "Semantic markup", percentage: 96, category: "Front-End" },
+  { index: "07", name: "CSS3", level: "Expert", description: "Styling and animations", percentage: 92, category: "Front-End" },
+  { index: "08", name: "Next.js", level: "Proficient", description: "Full-stack React", percentage: 72, category: "Front-End" },
+  { index: "09", name: "Node.js", level: "Advanced", description: "Server-side JavaScript", percentage: 85, category: "Back-End" },
+  { index: "10", name: "Express.js", level: "Advanced", description: "Web framework", percentage: 86, category: "Back-End" },
+  { index: "11", name: "REST API", level: "Advanced", description: "API design", percentage: 88, category: "Back-End" },
+  { index: "12", name: "GraphQL", level: "Intermediate", description: "Query language", percentage: 60, category: "Back-End" },
+  { index: "13", name: "Prisma", level: "Proficient", description: "Type-safe ORM", percentage: 75, category: "Back-End" },
+  { index: "14", name: "MongoDB", level: "Advanced", description: "NoSQL database", percentage: 80, category: "Database" },
+  { index: "15", name: "PostgreSQL", level: "Proficient", description: "Relational database", percentage: 70, category: "Database" },
+  { index: "16", name: "MySQL", level: "Beginner", description: "SQL database", percentage: 55, category: "Database" },
+  { index: "17", name: "Redis", level: "Beginner", description: "In-memory caching", percentage: 58, category: "Database" },
+  { index: "18", name: "Docker", level: "Proficient", description: "Containerization", percentage: 72, category: "DevOps" },
+  { index: "19", name: "Nginx", level: "Proficient", description: "Web server and proxy", percentage: 74, category: "DevOps" },
+  { index: "20", name: "Git", level: "Advanced", description: "Version control", percentage: 88, category: "DevOps" },
+  { index: "21", name: "Linux", level: "Proficient", description: "Server management", percentage: 70, category: "DevOps" },
+  { index: "22", name: "AWS", level: "Beginner", description: "Cloud services", percentage: 50, category: "DevOps" },
 ];
 
 export const testimonials = [

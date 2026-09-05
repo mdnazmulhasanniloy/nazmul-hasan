@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowUpRight, Github, Globe2, Smartphone } from "lucide-react";
+import { Apple, ArrowUpRight, Github, Globe2, Smartphone } from "lucide-react";
 import type { Project } from "@/data/portfolio";
 
 export function ProjectCard({ project }: { project: Project }) {
@@ -16,7 +16,7 @@ export function ProjectCard({ project }: { project: Project }) {
     <div className="mb-8 flex flex-wrap gap-2">{project.stack.map(x => <span key={x} className="border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted">{x}</span>)}</div>
     <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
       <Link href={`/projects/${project.slug}`} className="focus-ring inline-flex min-h-11 items-center border-b border-acid font-mono text-[11px] uppercase tracking-[.15em] text-white">Explore project</Link>
-      <div className="flex gap-1">{project.links.slice(0,3).map(link => <a key={link.href} href={link.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} ${link.label}`} className="focus-ring grid size-11 place-items-center text-muted transition-colors hover:text-acid">{link.kind === "github" ? <Github size={15}/> : link.kind === "web" ? <Globe2 size={15}/> : <Smartphone size={15}/>}</a>)}</div>
+      <div className="flex gap-1">{project.links.slice(0,3).map(link => <a key={link.href} href={link.href} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} ${link.label}`} className="focus-ring grid size-11 place-items-center text-muted transition-colors hover:text-acid">{link.kind === "github" ? <Github size={15}/> : link.kind === "web" ? <Globe2 size={15}/> : link.kind === "ios" ? <Apple size={15}/> : <Smartphone size={15}/>}</a>)}</div>
     </div>
   </motion.article>;
 }

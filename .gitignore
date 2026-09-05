@@ -1,8 +1,7 @@
 node_modules
-.env*
-.env.local
 .next/
 .next-build/
 .vercel/
 *.tsbuildinfo
 npm-debug.log*
+config.bat
